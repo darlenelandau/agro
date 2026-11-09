@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Сессия 16.11-05.12</title>
+<style>
+:root{
+  --bg:#f6f4ef; --card:#fff; --ink:#1f2328; --muted:#6b6f76; --line:#e4e0d8; --soft:#efece5;
+  --exam:#c2410c; --exambg:#fff1e8; --today:#2563eb;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c; --card:#1f2228; --ink:#e8e9eb; --muted:#9aa0a8; --line:#30343b; --soft:#262a31; --exam:#fb923c; --exambg:#3a2518; --today:#60a5fa;}
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:24px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px}
+.now{margin:18px 0;padding:14px 16px;border-radius:14px;background:var(--card);border:1px solid var(--line);display:flex;gap:14px;align-items:center}
+.now .dot{width:10px;height:10px;border-radius:50%;background:var(--today);flex:none}
+.now b{display:block}
+.tabs{display:flex;gap:6px;margin:16px 0 12px;position:sticky;top:0;background:var(--bg);padding:8px 0;z-index:5;flex-wrap:wrap}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;font:inherit}
+.tab.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.tab.ics{margin-left:auto}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);font-size:13px;cursor:pointer;color:var(--ink);text-decoration:none}
+.chip i{width:9px;height:9px;border-radius:50%;display:inline-block}
+.chip.off{opacity:.35}
+.daynav a{min-width:64px;justify-content:center}
+.daynav a.past{opacity:.45}
+.daynav a.today{border-color:var(--today);color:var(--today);font-weight:600}
+.daynav a.hasexam{border-color:var(--exam)}
+.week{margin:26px 0 8px;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.day{background:var(--card);border:1px solid var(--line);border-radius:14px;margin:10px 0;overflow:hidden;scroll-margin-top:70px}
+.day.past{opacity:.55}
+.day.today{border-color:var(--today);box-shadow:0 0 0 2px color-mix(in srgb,var(--today) 25%,transparent)}
+.dh{display:flex;justify-content:space-between;align-items:baseline;padding:10px 14px;border-bottom:1px solid var(--line);background:var(--soft)}
+.dh b{font-size:16px}
+.dh span{color:var(--muted);font-size:13px}
+.free{padding:12px 14px;color:var(--muted);font-style:italic}
+.blk{display:grid;grid-template-columns:96px 1fr auto;gap:12px;padding:10px 14px 10px 0;border-top:1px solid var(--line);position:relative}
+.blk:first-of-type{border-top:0}
+.blk::before{content:"";width:5px;background:var(--c);border-radius:0 4px 4px 0}
+.blk{grid-template-columns:5px 92px 1fr auto}
+.blk.dim{opacity:.18}
+.tm{font-variant-numeric:tabular-nums;font-size:14px}
+.tm small{display:block;color:var(--muted);font-size:12px}
+.sj{font-weight:600}
+.meta{color:var(--muted);font-size:13px}
+.room{text-align:right;font-weight:600;white-space:nowrap}
+.room small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.badge{display:inline-block;font-size:11px;padding:1px 7px;border-radius:6px;background:var(--soft);color:var(--muted);margin-left:6px;vertical-align:2px;font-weight:600}
+.blk.exam{background:var(--exambg)}
+.blk.exam .badge{background:var(--exam);color:#fff}
+.gap{padding:4px 14px 4px 109px;font-size:12px;color:var(--muted);border-top:1px dashed var(--line)}
+.list .row{display:grid;grid-template-columns:5px 120px 1fr auto;gap:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px 12px 0;margin:8px 0;align-items:center}
+.list .row::before{content:"";align-self:stretch;background:var(--c);border-radius:0 4px 4px 0}
+.list .row.past{opacity:.5}
+.big{font-size:17px;font-weight:700}
+.cnt{font-size:13px;color:var(--exam);font-weight:600}
+.subj{background:var(--card);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:12px;padding:12px 14px;margin:10px 0}
+.subj h3{margin:0 0 2px;font-size:16px}
+.subj .final{margin:8px 0;padding:6px 10px;border-radius:8px;background:var(--exambg);color:var(--exam);font-weight:600;font-size:14px;display:inline-block}
+.subj ul{margin:6px 0 0;padding-left:18px;font-size:14px}
+.subj li{margin:2px 0}
+.subj li.past{color:var(--muted);text-decoration:line-through}
+.subj a{color:inherit}
+.hide{display:none}
+@media (max-width:560px){
+  .blk{grid-template-columns:5px 74px 1fr}
+  .blk .room{grid-column:3;text-align:left}
+  .room small{display:inline;margin-left:6px}
+  .gap{padding-left:91px}
+  .list .row{grid-template-columns:5px 1fr}
+  .list .row > *{grid-column:2}
+}
+@media print{.tabs,.now,.chips{display:none}.day.past{opacity:1}.hide{display:block}.day{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Сессия: 2 курс, Садоводство</h1>
+  <div class="sub">ЗФО, гр. 350305/З2501 · 16 ноября - 5 декабря 2026</div>
+  <div class="now" id="now"></div>
+
+  <div class="tabs">
+    <button class="tab on" data-v="days">Расписание</button>
+    <button class="tab" data-v="exams">Экзамены и зачёты</button>
+    <button class="tab" data-v="subjects">По предметам</button>
+    <button class="tab ics" id="ics">📅 В календарь</button>
+  </div>
+
+  <section id="v-days">
+    <div class="chips daynav" id="daynav"></div>
+    <div class="chips" id="filter"></div>
+    <div id="days"></div>
+  </section>
+  <section id="v-exams" class="hide list"></section>
+  <section id="v-subjects" class="hide"></section>
+</div>
+
+<script>
+const DAYS = [{"name": "Понедельник", "date": "2026-11-16", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Общее собрание", "kind": "Событие", "sub": "", "teacher": "", "room": "1411"}, {"n": 2, "time": "10.55-12.30", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1106"}, {"n": 3, "time": "13.10-14.45", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1106"}, {"n": 4, "time": "15.05-16.40", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1311 НК"}, {"n": 5, "time": "17.00-18.35", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1311 НК"}]}, {"name": "Вторник", "date": "2026-11-17", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Сельскохозяйственная экология", "kind": "л", "sub": "", "teacher": "Мельников С.П., доцент", "room": "9207"}, {"n": 2, "time": "10.55-12.30", "subj": "Полеводство", "kind": "л", "sub": "", "teacher": "Цирульник О.Г., доцент", "room": "1507"}, {"n": 3, "time": "13.10-14.45", "subj": "Сельскохозяйственная экология", "kind": "ПЗ", "sub": "", "teacher": "Базыкина А.Н., ст.пр.", "room": "9207"}, {"n": 4, "time": "15.05-16.40", "subj": "Экономическая теория", "kind": "л", "sub": "", "teacher": "Переверзева Е.С., доцент", "room": "1411"}, {"n": 5, "time": "17.00-18.35", "subj": "Экономическая теория", "kind": "ПЗ", "sub": "", "teacher": "Переверзева Е.С., доцент", "room": "1411"}, {"n": 6, "time": "18.55-20.30", "subj": "Полеводство", "kind": "ПЗ", "sub": "", "teacher": "Цирульник О.Г., доцент", "room": "1507"}]}, {"name": "Среда", "date": "2026-11-18", "pairs": [{"n": 3, "time": "13.10-14.45", "subj": "Сельскохозяйственная экология", "kind": "ПЗ", "sub": "", "teacher": "Базыкина А.Н., ст.пр.", "room": "9207"}, {"n": 4, "time": "15.05-16.40", "subj": "Экономическая теория", "kind": "ПЗ", "sub": "", "teacher": "Переверзева Е.С., доцент", "room": "2233 НК"}, {"n": 5, "time": "17.00-18.35", "subj": "Экономическая теория", "kind": "ПЗ", "sub": "", "teacher": "Переверзева Е.С., доцент", "room": "2233 НК"}]}, {"name": "Четверг", "date": "2026-11-19", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Почвоведение с основами геологии", "kind": "л", "sub": "", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9111"}, {"n": 2, "time": "10.55-12.30", "subj": "Сельскохозяйственная экология", "kind": "ПЗ", "sub": "", "teacher": "Базыкина А.Н., ст.пр.", "room": "9120"}, {"n": 3, "time": "13.10-14.45", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1535"}, {"n": 4, "time": "15.05-16.40", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1535"}, {"n": 5, "time": "17.00-18.35", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1411"}, {"n": 6, "time": "18.55-20.30", "subj": "История России", "kind": "л", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1526"}]}, {"name": "Пятница", "date": "2026-11-20", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Общее земледелие", "kind": "л", "sub": "", "teacher": "Бахмудов Д.А., доцент", "room": "1523"}, {"n": 2, "time": "10.55-12.30", "subj": "Общее земледелие", "kind": "л", "sub": "", "teacher": "Бахмудов Д.А., доцент", "room": "1523"}, {"n": 3, "time": "13.10-14.45", "subj": "Общее земледелие", "kind": "ПЗ", "sub": "", "teacher": "Бахмудов Д.А., доцент", "room": "1414"}, {"n": 4, "time": "15.05-16.40", "subj": "Полеводство", "kind": "ПЗ", "sub": "", "teacher": "Цирульник О.Г., доцент", "room": "1505"}, {"n": 5, "time": "17.00-18.35", "subj": "Полеводство", "kind": "ПЗ", "sub": "", "teacher": "Цирульник О.Г., доцент", "room": "1505"}]}, {"name": "Суббота", "date": "2026-11-21", "pairs": []}, {"name": "Понедельник", "date": "2026-11-23", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Общее земледелие", "kind": "ПЗ", "sub": "", "teacher": "Бахмудов Р.Б., доцент", "room": "1523"}, {"n": 2, "time": "10.55-12.30", "subj": "Общее земледелие", "kind": "ПЗ", "sub": "", "teacher": "Бахмудов Р.Б., доцент", "room": "1523"}, {"n": 3, "time": "13.10-14.45", "subj": "История России", "kind": "ПЗ", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1411"}, {"n": 4, "time": "15.05-16.40", "subj": "История России", "kind": "ПЗ", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1411"}, {"n": 5, "time": "17.00-18.35", "subj": "История России", "kind": "ПЗ", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1411"}, {"n": 6, "time": "18.55-20.30", "subj": "История России", "kind": "ПЗ", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1411"}]}, {"name": "Вторник", "date": "2026-11-24", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Сельскохозяйственная экология", "kind": "л", "sub": "", "teacher": "Мельников С.П., доцент", "room": "9207"}, {"n": 2, "time": "10.55-12.30", "subj": "Общее земледелие", "kind": "ПЗ", "sub": "", "teacher": "Бахмудов Р.Б., доцент", "room": "1523"}, {"n": 3, "time": "13.10-14.45", "subj": "Сельскохозяйственная экология", "kind": "ПЗ", "sub": "", "teacher": "Базыкина А.Н., ст.пр.", "room": "9207"}, {"n": 4, "time": "15.05-16.40", "subj": "Почвоведение с основами геологии", "kind": "ПЗ", "sub": "", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9111"}, {"n": 5, "time": "17.00-18.35", "subj": "Почвоведение с основами геологии", "kind": "л/з", "sub": "1 подгруппа", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9111"}]}, {"name": "Среда", "date": "2026-11-25", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Базовая физическая культура", "kind": "ПЗ", "sub": "", "teacher": "Пронин Е.А., доцент", "room": "спортзал"}, {"n": 2, "time": "10.55-12.30", "subj": "Базовая физическая культура", "kind": "ПЗ", "sub": "", "teacher": "Пронин Е.А., доцент", "room": "спортзал"}]}, {"name": "Четверг", "date": "2026-11-26", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Генетика", "kind": "л", "sub": "", "teacher": "Тырышкин Л.Г., профессор", "room": "1505"}, {"n": 3, "time": "13.10-14.45", "subj": "История России", "kind": "ПЗ", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1506"}, {"n": 4, "time": "15.05-16.40", "subj": "История России", "kind": "ПЗ", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "1506"}, {"n": 5, "time": "17.00-18.35", "subj": "Генетика", "kind": "ПЗ", "sub": "", "teacher": "Тырышкин Л.Г., профессор", "room": "1505"}]}, {"name": "Пятница", "date": "2026-11-27", "pairs": [{"n": 2, "time": "10.55-12.30", "subj": "Почвоведение с основами геологии", "kind": "л/з", "sub": "2 подгруппа", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9109"}, {"n": 3, "time": "13.10-14.45", "subj": "Почвоведение с основами геологии", "kind": "ПЗ", "sub": "", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9111"}, {"n": 4, "time": "15.05-16.40", "subj": "Генетика", "kind": "ПЗ", "sub": "", "teacher": "Тырышкин Л.Г., профессор", "room": "1505"}, {"n": 5, "time": "17.00-18.35", "subj": "Генетика", "kind": "ПЗ", "sub": "", "teacher": "Тырышкин Л.Г., профессор", "room": "1505"}]}, {"name": "Суббота", "date": "2026-11-28", "pairs": []}, {"name": "Понедельник", "date": "2026-11-30", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Общее земледелие", "kind": "Экзамен", "sub": "", "teacher": "Бахмудов Р.Б., доцент", "room": "1523"}, {"n": 2, "time": "10.55-12.30", "subj": "Общее земледелие", "kind": "Экзамен", "sub": "", "teacher": "Бахмудов Р.Б., доцент", "room": "1523"}]}, {"name": "Вторник", "date": "2026-12-01", "pairs": [{"n": 1, "time": "09.00-10.35", "subj": "Сельскохозяйственная экология", "kind": "Экзамен", "sub": "", "teacher": "Мельников С.П., доцент", "room": "9207"}, {"n": 2, "time": "10.55-12.30", "subj": "Сельскохозяйственная экология", "kind": "Экзамен", "sub": "", "teacher": "Мельников С.П., доцент", "room": "9207"}, {"n": 4, "time": "15.05-16.40", "subj": "Экономическая теория", "kind": "Зачет с оценкой", "sub": "", "teacher": "Переверзева Е.С., доцент", "room": "3231 НК"}]}, {"name": "Среда", "date": "2026-12-02", "pairs": [{"n": 5, "time": "17.00-18.35", "subj": "Полеводство", "kind": "Зачет", "sub": "", "teacher": "Цирульник О.Г., доцент", "room": "1507"}]}, {"name": "Четверг", "date": "2026-12-03", "pairs": [{"n": 3, "time": "13.10-14.45", "subj": "История России", "kind": "Зачет с оценкой", "sub": "", "teacher": "Емельянова Т.В., доцент", "room": "2234 НК"}, {"n": 4, "time": "15.05-16.40", "subj": "Базовая физическая культура", "kind": "Зачет", "sub": "", "teacher": "Пронин Е.А., доцент", "room": "кафедра физкультуры"}]}, {"name": "Пятница", "date": "2026-12-04", "pairs": [{"n": 2, "time": "10.55-12.30", "subj": "Почвоведение с основами геологии", "kind": "Экзамен", "sub": "", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9111"}, {"n": 3, "time": "13.10-14.45", "subj": "Почвоведение с основами геологии", "kind": "Экзамен", "sub": "", "teacher": "Ивахнова О.Ф., ст.пр.", "room": "9111"}, {"n": 4, "time": "15.05-16.40", "subj": "Генетика", "kind": "Зачет с оценкой", "sub": "", "teacher": "Тырышкин Л.Г., профессор", "room": "1505"}]}, {"name": "Суббота", "date": "2026-12-05", "pairs": []}]
+;
+const COLORS = {
+  "История России":"#d97706",
+  "Общее земледелие":"#16a34a",
+  "Сельскохозяйственная экология":"#0d9488",
+  "Полеводство":"#65a30d",
+  "Экономическая теория":"#7c3aed",
+  "Почвоведение с основами геологии":"#92400e",
+  "Генетика":"#db2777",
+  "Базовая физическая культура":"#2563eb",
+  "Общее собрание":"#64748b"
+};
+const SHORT = {"Сельскохозяйственная экология":"С/х экология","Почвоведение с основами геологии":"Почвоведение","Базовая физическая культура":"Физкультура","Экономическая теория":"Экономтеория"};
+const KIND = {"л":"лекция","ПЗ":"практика","л/з":"лабораторная","Экзамен":"экзамен","Зачет":"зачёт","Зачет с оценкой":"зачёт с оценкой","Событие":""};
+const isExam = k => /Экзамен|Зачет/.test(k);
+const MON = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
+const fmt = iso => { const [y,m,d]=iso.split("-"); return `${+d} ${MON[m-1]}`; };
+const col = s => COLORS[s] || "#888";
+const roomTxt = r => r;
+const pad = n => String(n).padStart(2,"0");
+const todayISO = (()=>{const t=new Date();return `${t.getFullYear()}-${pad(t.getMonth()+1)}-${pad(t.getDate())}`})();
+
+// группируем подряд идущие одинаковые пары
+for (const d of DAYS){
+  d.blocks=[];
+  for (const p of d.pairs){
+    const b=d.blocks.at(-1);
+    if (b && b.subj===p.subj && b.kind===p.kind && b.room===p.room && b.sub===p.sub && b.to===p.n-1){
+      b.to=p.n; b.end=p.time.split("-")[1];
+    } else d.blocks.push({...p, from:p.n, to:p.n, start:p.time.split("-")[0], end:p.time.split("-")[1]});
+  }
+  d.exam = d.blocks.some(b=>isExam(b.kind));
+}
+const ABBR={"Понедельник":"Пн","Вторник":"Вт","Среда":"Ср","Четверг":"Чт","Пятница":"Пт","Суббота":"Сб"};
+const pl=n=>n+(n===1?" пара":n<5?" пары":" пар");
+const toDate=(iso,t)=>{const [h,m]=t.split(".");return new Date(iso+"T"+h.padStart(2,"0")+":"+m+":00");};
+
+function blockHTML(d,b){
+  const n = b.from===b.to ? `${b.from} пара` : `${b.from}-${b.to} пары`;
+  const kind = KIND[b.kind]??b.kind;
+  return `<div class="blk${isExam(b.kind)?" exam":""}" data-s="${b.subj}" style="--c:${col(b.subj)}">
+    <div class="tm">${b.start}-${b.end}<small>${n}</small></div>
+    <div><span class="sj">${b.subj}</span>${kind?`<span class="badge">${kind}</span>`:""}
+      <div class="meta">${b.teacher}${b.sub?" · "+b.sub:""}</div></div>
+    <div class="room">${roomTxt(b.room)}</div></div>`;
+}
+
+// дни
+let html="", wk=0;
+DAYS.forEach((d,i)=>{
+  if (i%6===0){ wk++; html+=`<div class="week">Неделя ${wk} · ${wk%2?"нечётная":"чётная"}</div>`; }
+  const cls = d.date<todayISO?" past":d.date===todayISO?" today":"";
+  html+=`<div class="day${cls}" id="d${d.date}"><div class="dh"><b>${d.name}, ${fmt(d.date)}</b><span>${d.blocks.length?pl(d.pairs.length)+" · "+d.blocks[0].start+"-"+d.blocks.at(-1).end:""}</span></div>`;
+  if(!d.blocks.length) html+=`<div class="free">Занятий нет</div>`;
+  d.blocks.forEach((b,j)=>{
+    if (j>0 && b.from>d.blocks[j-1].to+1) html+=`<div class="gap">окно ${d.blocks[j-1].end}-${b.start}</div>`;
+    html+=blockHTML(d,b);
+  });
+  html+=`</div>`;
+});
+document.getElementById("days").innerHTML=html;
+document.getElementById("daynav").innerHTML = DAYS.map(d=>{
+  const c=[d.date<todayISO?"past":"", d.date===todayISO?"today":"", d.exam?"hasexam":""].join(" ");
+  return `<a class="chip ${c}" href="#d${d.date}">${ABBR[d.name]} ${+d.date.slice(8)}${d.exam?" ★":""}</a>`;
+}).join("");
+
+// фильтр по предмету
+const subjects=[...new Set(DAYS.flatMap(d=>d.pairs.map(p=>p.subj)))];
+let active=null;
+const filter=document.getElementById("filter");
+filter.innerHTML=subjects.map(s=>`<span class="chip" data-s="${s}"><i style="background:${col(s)}"></i>${SHORT[s]||s}</span>`).join("");
+filter.onclick=e=>{
+  const c=e.target.closest(".chip"); if(!c) return;
+  active = active===c.dataset.s ? null : c.dataset.s;
+  filter.querySelectorAll(".chip").forEach(x=>x.classList.toggle("off",active&&x.dataset.s!==active));
+  document.querySelectorAll("#days .blk").forEach(x=>x.classList.toggle("dim",active&&x.dataset.s!==active));
+};
+
+// экзамены
+const exams=DAYS.flatMap(d=>d.blocks.filter(b=>isExam(b.kind)).map(b=>({...b,date:d.date,day:d.name})));
+const daysLeft=iso=>Math.round((new Date(iso)-new Date(todayISO))/864e5);
+document.getElementById("v-exams").innerHTML = `<p class="sub">${exams.filter(e=>/Экзамен/.test(e.kind)).length} экзамена и ${exams.filter(e=>/Зачет/.test(e.kind)).length} зачётов, все в последнюю неделю.</p>`+
+  exams.map(e=>{const l=daysLeft(e.date);return `<div class="row${l<0?" past":""}" style="--c:${col(e.subj)}">
+    <div><div class="big">${fmt(e.date)}</div><div class="meta">${e.day}, ${e.start}</div></div>
+    <div><span class="sj">${e.subj}</span><span class="badge" style="background:var(--exam);color:#fff">${KIND[e.kind]}</span><div class="meta">${e.teacher}</div></div>
+    <div class="room">${roomTxt(e.room)}${l>=0?`<div class="cnt">${l===0?"сегодня":"через "+l+" дн."}</div>`:""}</div></div>`}).join("");
+
+// по предметам
+document.getElementById("v-subjects").innerHTML = subjects.filter(s=>s!=="Общее собрание").map(s=>{
+  const items=DAYS.flatMap(d=>d.blocks.filter(b=>b.subj===s).map(b=>({...b,date:d.date,day:d.name})));
+  const fin=items.filter(b=>isExam(b.kind));
+  const teachers=[...new Set(items.map(b=>b.teacher))].join("; ");
+  const cnt=k=>items.filter(b=>b.kind===k).reduce((a,b)=>a+b.to-b.from+1,0);
+  const stat=[["л","лекций"],["ПЗ","практик"],["л/з","лаб."]].map(([k,w])=>cnt(k)?cnt(k)+" "+w:"").filter(Boolean).join(", ");
+  return `<div class="subj" style="--c:${col(s)}"><h3>${s}</h3><div class="meta">${teachers}${stat?" · "+stat+" (пар)":""}</div>
+    ${fin.map(f=>`<div class="final">${KIND[f.kind]}: ${f.day.toLowerCase()}, ${fmt(f.date)}, ${f.start}, ауд. ${f.room}</div>`).join(" ")}
+    <ul>${items.filter(b=>!isExam(b.kind)).map(b=>`<li class="${b.date<todayISO?"past":""}"><a href="#d${b.date}" data-go>${fmt(b.date)}</a>, ${b.start}-${b.end} · ${KIND[b.kind]}${b.sub?" ("+b.sub+")":""} · ауд. ${b.room}</li>`).join("")}</ul></div>`;
+}).join("");
+document.getElementById("v-subjects").onclick=e=>{ if(e.target.dataset.go!==undefined) show("days"); };
+
+// вкладки
+function show(v){
+  document.querySelectorAll(".tab[data-v]").forEach(t=>t.classList.toggle("on",t.dataset.v===v));
+  ["days","exams","subjects"].forEach(x=>document.getElementById("v-"+x).classList.toggle("hide",x!==v));
+}
+document.querySelectorAll(".tab[data-v]").forEach(t=>t.onclick=()=>show(t.dataset.v));
+
+// сейчас / дальше
+(function(){
+  const now=new Date(); let cur=null,next=null;
+  for(const d of DAYS) for(const b of d.blocks){
+    const s=toDate(d.date,b.start), e=toDate(d.date,b.end);
+    if(s<=now&&now<e) cur={d,b}; else if(s>now&&!next) next={d,b};
+  }
+  const el=document.getElementById("now");
+  const line=(x,lab)=>`<div><span class="sub">${lab}</span><b>${x.b.subj}${KIND[x.b.kind]?" · "+KIND[x.b.kind]:""}</b><span class="sub">${x.d.name}, ${fmt(x.d.date)}, ${x.b.start}-${x.b.end}, ауд. ${x.b.room}</span></div>`;
+  if(cur) el.innerHTML=`<div class="dot"></div>`+line(cur,"Сейчас идёт");
+  else if(next) el.innerHTML=`<div class="dot"></div>`+line(next,"Следующее занятие");
+  else el.innerHTML=`<div class="dot" style="background:#16a34a"></div><div><b>Сессия позади 🎉</b></div>`;
+  const t=document.getElementById("d"+todayISO); if(t) setTimeout(()=>t.scrollIntoView({block:"start"}),50);
+})();
+
+// .ics
+document.getElementById("ics").onclick=()=>{
+  const st=(iso,t)=>iso.replace(/-/g,"")+"T"+t.replace(".","").padStart(4,"0")+"00";
+  const esc=s=>s.replace(/[,;]/g,m=>"\\"+m);
+  let out=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//session//RU","CALSCALE:GREGORIAN"];
+  DAYS.forEach(d=>d.blocks.forEach((b,i)=>{
+    out.push("BEGIN:VEVENT",`UID:${d.date}-${b.from}@session`,`DTSTART;TZID=Europe/Moscow:${st(d.date,b.start)}`,`DTEND;TZID=Europe/Moscow:${st(d.date,b.end)}`,
+      `SUMMARY:${esc((isExam(b.kind)?"❗ "+KIND[b.kind].toUpperCase()+": ":"")+(SHORT[b.subj]||b.subj)+(KIND[b.kind]&&!isExam(b.kind)?" ("+KIND[b.kind]+")":""))}`,
+      `LOCATION:${esc("ауд. "+b.room)}`,`DESCRIPTION:${esc(b.teacher+(b.sub?" · "+b.sub:""))}`,"END:VEVENT");
+  }));
+  out.push("END:VCALENDAR");
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([out.join("\r\n")],{type:"text/calendar"}));
+  a.download="сессия_ноябрь_2026.ics"; a.click();
+};
+</script>
+</body>
+</html>
