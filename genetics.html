@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Генетика: лекция 1</title>
+<style>
+:root{
+  --bg:#f6f4ef; --card:#fff; --ink:#1f2328; --muted:#6b6f76; --line:#e4e0d8; --soft:#efece5;
+  --acc:#16a34a; --accbg:#e9f7ee; --warn:#c2410c; --warnbg:#fff1e8; --blue:#2563eb; --bluebg:#eaf1ff;
+  --term:#7c3aed; --termbg:#f1eafe; --dom:#b45309; --rec:#0f766e;
+}
+@media (prefers-color-scheme: dark){
+  :root{--bg:#16181c; --card:#1f2228; --ink:#e8e9eb; --muted:#9aa0a8; --line:#353a42; --soft:#272b32;
+  --acc:#4ade80; --accbg:#183424; --warn:#fb923c; --warnbg:#3a2518; --blue:#60a5fa; --bluebg:#1c2a44;
+  --term:#c4b5fd; --termbg:#2c2343; --dom:#fbbf24; --rec:#5eead4;}
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:22px 16px 80px}
+a{color:var(--blue)}
+h1{font-size:26px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:14px}
+.back{font-size:14px;text-decoration:none}
+.bar{position:sticky;top:0;z-index:10;background:var(--bg);padding:10px 0 8px;border-bottom:1px solid var(--line);margin-top:12px}
+.nav{display:flex;flex-wrap:wrap;gap:4px}
+.nav a{font-size:13px;padding:4px 10px;border-radius:999px;background:var(--card);border:1px solid var(--line);text-decoration:none;color:var(--ink);white-space:nowrap}
+.nav a:hover{border-color:var(--acc)}
+.nav a.g{border-color:var(--term);color:var(--term)}
+section{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px 20px 18px;margin:16px 0;scroll-margin-top:110px}
+section>h2{font-size:20px;margin:16px 0 8px;display:flex;gap:10px;align-items:baseline}
+section>h2 .n{color:var(--acc);font-variant-numeric:tabular-nums}
+h3{font-size:16px;margin:20px 0 6px}
+ul,ol{margin:6px 0;padding-left:22px}
+li{margin:3px 0}
+.term{color:var(--term);background:var(--termbg);border-radius:5px;padding:0 4px;font-weight:600;cursor:pointer;text-decoration:none}
+.def{border-left:4px solid var(--term);background:var(--termbg);padding:8px 12px;border-radius:0 10px 10px 0;margin:10px 0}
+.mem{border-left:4px solid var(--warn);background:var(--warnbg);padding:8px 12px;border-radius:0 10px 10px 0;margin:10px 0}
+.mem::before{content:"Запомнить: ";font-weight:700;color:var(--warn)}
+.lec{border-left:4px solid var(--blue);background:var(--bluebg);padding:8px 12px;border-radius:0 10px 10px 0;margin:10px 0;font-size:15px}
+.lec::before{content:"Лектор: ";font-weight:700;color:var(--blue)}
+.gap{border:2px dashed var(--muted);color:var(--muted);padding:8px 12px;border-radius:10px;margin:12px 0;font-size:14px}
+.cross{font-family:ui-monospace,Menlo,monospace;background:var(--soft);padding:10px 14px;border-radius:10px;margin:10px 0;font-size:14.5px;line-height:1.9;overflow-x:auto;white-space:nowrap}
+.cross .l{display:inline-block;width:34px;color:var(--muted);font-weight:700}
+.cross .c{color:var(--muted);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px}
+.D{color:var(--dom);font-weight:700}.R{color:var(--rec);font-weight:700}
+table{border-collapse:collapse;width:100%;font-size:14px;margin:8px 0}
+th,td{border:1px solid var(--line);padding:6px 8px;text-align:left;vertical-align:top}
+th{background:var(--soft)}
+.tw{overflow-x:auto}
+table.pun td,table.pun th{text-align:center;font-family:ui-monospace,Menlo,monospace}
+.ratio{display:inline-block;font-weight:700;background:var(--accbg);color:var(--acc);border-radius:8px;padding:0 8px;font-variant-numeric:tabular-nums}
+.fig{margin:14px 0;text-align:center}
+.fig svg{max-width:100%;height:auto}
+.fig .cap{font-size:13px;color:var(--muted);margin-top:4px}
+svg text{fill:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:13px}
+svg .sm{font-size:11px}
+svg .mut{fill:var(--muted)}
+svg .ln{stroke:var(--muted);stroke-width:1.6;fill:none}
+#glossary input{width:100%;font:inherit;padding:8px 12px;border-radius:10px;border:1px solid var(--line);background:var(--bg);color:var(--ink);margin:6px 0 10px}
+dl.gl{margin:0}
+dl.gl div{padding:8px 0;border-bottom:1px solid var(--line);scroll-margin-top:110px}
+dl.gl div.hl{background:var(--termbg);border-radius:8px}
+dl.gl dt{font-weight:700;color:var(--term);display:inline}
+dl.gl dd{display:inline;margin:0}
+dl.gl dd::before{content:" — "}
+dl.gl .go{font-size:12px;margin-left:6px}
+@media print{.bar,.back{display:none}section{break-inside:avoid-page}}
+@media (max-width:560px){section{padding:4px 12px 14px}}
+</style>
+</head>
+<body><div class="wrap">
+<a class="back" href="index.html">← все материалы</a>
+<h1>Генетика: лекция 1</h1>
+<div class="sub">Законы Менделя, взаимодействие аллелей и генов, хи-квадрат, митоз и мейоз, размножение растений, хромосомная теория, наследование, сцепленное с полом. Собрано по записи лекции и рукописному конспекту. Учебник: М.Е. Лобашев «Генетика».</div>
+
+<div class="bar"><nav class="nav">
+<a href="#s1">1. Что такое генетика</a><a href="#s2">2. Опыты Менделя</a><a href="#s3">3. Основные понятия</a><a href="#s4">4. Моногибридное</a><a href="#s5">5. Взаимодействие аллелей</a><a href="#s6">6. Хи-квадрат</a><a href="#s7">7. Дигибридное</a><a href="#s8">8. Взаимодействие генов</a><a href="#s9">9. Митоз</a><a href="#s10">10. Мейоз</a><a href="#s11">11. Растения</a><a href="#s12">12. Хромосомная теория</a><a href="#s13">13. Определение пола</a><a href="#s14">14. Сцепленное с полом</a><a href="#glossary" class="g">Словарь терминов</a>
+</nav></div>
+
+<!-- 1 -->
+<section id="s1"><h2><span class="n">1</span>Что изучает генетика</h2>
+<p><b class="term">Генетика</b> изучает два свойства живых организмов: наследственность и изменчивость.</p>
+<div class="def"><b class="term">Наследственность</b> — свойство живых организмов сохранять и передавать потомству свои признаки и свойства.</div>
+<div class="def"><b class="term">Изменчивость</b> — свойство живых организмов изменяться в течение своей жизни и часть этих изменений передавать потомству.</div>
+<p>Изменчивость отвечает на вопрос, почему дети не идентичны родителям и почему от яблони с красными плодами могут вырасти саженцы с белыми.</p>
+<p><b>Рождение генетики как науки: 1865 год, Грегор Мендель.</b></p>
+</section>
+
+<!-- 2 -->
+<section id="s2"><h2><span class="n">2</span>Опыты Менделя</h2>
+<p>Мендель работал с горохом посевным, <i>Pisum sativum</i>. Удобство гороха: он умеет скрещиваться сам на себя (самоопыляется).</p>
+<div class="lec">Похожие опыты ставили многие и до Менделя, но строгих выводов не сделал никто. Мендель сделал три вещи, которых до него не делал никто.</div>
+<h3>Три причины успеха Менделя</h3>
+<ol>
+<li><b>Сначала получил чистые линии</b>, а уже потом изучал закономерности наследования.
+<div class="def"><b class="term">Чистая линия</b> — организмы, которые при скрещивании с организмами с такими же свойствами не дают расщепления.</div>
+Как получал: растение с жёлтыми семенами несколько поколений скрещивал само на себя, а растения, давшие зелёные семена, выбрасывал. В итоге потомство давало только жёлтые семена. Дальше скрещивал чистые линии между собой: <i>чистая линия × чистая линия</i>.</li>
+<li><b>Изучал не все признаки сразу, а только один</b>: например, только цвет семян, или только высоту, или только форму семян.</li>
+<li><b>Применил арифметический (математический) аппарат</b>: считал потомков и отношения между классами. В биологии до него этого не делал никто.</li>
+</ol>
+<h3>Как скрещивают горох</h3>
+<p>У молодого растения, пока цветки ещё зелёные, пинцетом удаляют тычинки (<b class="term">кастрация</b>), надевают на растение мешочек и потом переносят на него пыльцу с другого растения.</p>
+<ul>
+<li>Растение, у которого удалили тычинки и на которое нанесли пыльцу, называется <b class="term">материнским растением</b>, обозначается ♀.</li>
+<li>Растение, с которого взяли пыльцу, называется <b>отцовским</b>, обозначается ♂.</li>
+</ul>
+<h3>Обозначения в схемах скрещивания</h3>
+<table><tr><th>Знак</th><th>Что значит</th></tr>
+<tr><td>P</td><td>родители</td></tr>
+<tr><td>×</td><td>скрещивание</td></tr>
+<tr><td>Г (G)</td><td>гаметы</td></tr>
+<tr><td>F<sub>1</sub>, F<sub>2</sub></td><td>гибриды первого, второго поколения</td></tr>
+<tr><td>♀ / ♂</td><td>материнский (женский) / отцовский (мужской) организм</td></tr>
+</table>
+<p>Из выводов Менделя выросли три закономерности, которые в школьных учебниках называют «три закона Менделя».</p>
+<div class="lec">У самого Менделя никаких «трёх законов» не было, это более позднее школьное название. Мендель был скромный монах.</div>
+</section>
+
+<!-- 3 -->
+<section id="s3"><h2><span class="n">3</span>Основные понятия (выводы Менделя)</h2>
+<ol>
+<li><b>За каждым внешним признаком лежит внутренний фактор, который его определяет.</b> Сейчас этот фактор называют <b class="term">геном</b>.</li>
+<li><b>Один ген может быть в нескольких разных состояниях.</b> Эти альтернативные состояния сейчас называют <b class="term">аллелями</b> гена.</li>
+<li><b>Внешнее проявление гена</b> называют <b class="term">фенотипом</b>, а <b>совокупность аллелей</b>, которые определяют признак, называют <b class="term">генотипом</b>.</li>
+</ol>
+<div class="lec">Слов «ген», «аллель», «фенотип», «генотип» у Менделя не было, эти термины появились через 40-50 лет после него. Смысл тот же.</div>
+<p>Мендель предложил обозначать внутренние факторы буквами. Одна буква означает один ген, большая и маленькая буква (<span class="D">A</span> и <span class="R">a</span>) означают разные аллели этого гена.</p>
+<h3>Главная догадка Менделя</h3>
+<div class="mem">В неполовых клетках (<b class="term">соматических клетках</b>) по <b>2 аллеля</b> каждого гена, а в половых клетках (<b class="term">гаметах</b>) по <b>1 аллелю</b>. Два аллеля в соматических клетках не сливаются и существуют отдельно друг от друга.</div>
+<p>На этом держится вся современная генетика.</p>
+<h3>Доминантный и рецессивный</h3>
+<p>Мендель скрестил растения с жёлтыми и с зелёными семенами. В F<sub>1</sub> все семена жёлтые.</p>
+<div class="def"><b class="term">Доминантный признак</b> (аллель) — тот, что проявился в F<sub>1</sub> (здесь жёлтый). <b class="term">Рецессивный признак</b> (аллель) — тот, что в F<sub>1</sub> «исчез» (зелёный).</div>
+<p>Доминантный аллель пишут большой буквой (<span class="D">A</span> — «А большое»), рецессивный маленькой (<span class="R">a</span> — «а малое»). Какую букву делать большой, решают по результату: увидели, что F<sub>1</sub> жёлтое, значит жёлтый = <span class="D">A</span>.</p>
+<h3>Гомозигота и гетерозигота</h3>
+<div class="def"><b class="term">Гомозигота</b> — организм, имеющий два одинаковых аллеля одного гена (<span class="D">AA</span> — доминантная гомозигота, <span class="R">aa</span> — рецессивная гомозигота).</div>
+<div class="def"><b class="term">Гетерозигота</b> — организм, имеющий два разных аллеля одного гена (<span class="D">A</span><span class="R">a</span>).</div>
+<p><b class="term">Диплоидный</b> организм (как мы с вами) имеет двойной набор, поэтому в генотипе пишут обязательно две буквы.</p>
+<h3>Сколько аллелей бывает у гена</h3>
+<ul>
+<li>У <b>вида</b> (у тысяч собак, миллиона яблонь) разных аллелей одного гена может быть сколько угодно много.</li>
+<li>У <b>одного диплоидного организма</b> одновременно не больше двух аллелей гена.</li>
+<li>Бывает и один аллель у диплоида: такое состояние называется <b class="term">гемизигота</b> (см. <a href="#s14">наследование, сцепленное с полом</a>).</li>
+</ul>
+<div class="lec">Аллели отличаются друг от друга тем, что когда-то в одном из них произошла мутация. Любой рецессивный аллель отличается от доминантного какой-то мутацией.</div>
+</section>
+
+<!-- 4 -->
+<section id="s4"><h2><span class="n">4</span>Моногибридное скрещивание: I и II законы Менделя</h2>
+<p><b class="term">Моногибридное скрещивание</b>: родители различаются по одному признаку. Пример: <span class="D">A</span> — жёлтые семена, <span class="R">a</span> — зелёные.</p>
+<h3>Первое поколение</h3>
+<div class="cross">
+<span class="l">P</span>♀ <span class="D">AA</span> <span class="c">(жёлт.)</span> × ♂ <span class="R">aa</span> <span class="c">(зел.)</span><br>
+<span class="l">Г</span><span class="D">A</span> <span class="c">(яйцеклетка)</span> &nbsp;&nbsp; <span class="R">a</span> <span class="c">(спермий)</span><br>
+<span class="l">F₁</span><span class="D">A</span><span class="R">a</span> <span class="c">— гетерозигота, все жёлтые</span>
+</div>
+<div class="lec">У гаметы фенотипа нет: у спермия нет семян, поэтому «зелёный спермий» сказать нельзя.</div>
+<div class="def"><b class="term">I закон Менделя</b> — <b>закон единообразия гибридов первого поколения</b>: при скрещивании чистых линий все гибриды F<sub>1</sub> одинаковы.</div>
+<h3>Второе поколение</h3>
+<div class="lec">В учебниках пишут «F<sub>2</sub> получают скрещиванием растений F<sub>1</sub> между собой». Это не совсем правильно: собачка сама с собой не скрестится. Правильно: <b>F<sub>2</sub> — потомство от скрещивания особей F<sub>1</sub> между собой.</b> Горох и пшеница могут сами на себя, рожь, кролики, люди нет.</div>
+<div class="cross">
+<span class="l">P</span>♀ <span class="D">A</span><span class="R">a</span> × ♂ <span class="D">A</span><span class="R">a</span><br>
+<span class="l">Г</span><span class="D">A</span>, <span class="R">a</span> &nbsp;&nbsp;&nbsp;&nbsp; <span class="D">A</span>, <span class="R">a</span> <span class="c">(каждый родитель даёт 2 типа гамет)</span><br>
+<span class="l">F₂</span>1 <span class="D">AA</span> : 2 <span class="D">A</span><span class="R">a</span> : 1 <span class="R">aa</span>
+</div>
+<p>Расщепление по генотипу <span class="ratio">1 : 2 : 1</span>, по фенотипу <span class="ratio">3 : 1</span> (3 жёлтых : 1 зелёный).</p>
+<div class="def"><b class="term">II закон Менделя</b> — <b>закон расщепления гибридов второго поколения</b>: в F<sub>2</sub> наблюдается расщепление по изучаемым признакам.</div>
+<h3>Запись в виде радикала</h3>
+<p>Расщепление <b>по фенотипу</b> можно записывать так: <b>3 <span class="D">A</span>– : 1 <span class="R">aa</span></b>. Чёрточка называется <b class="term">радикал</b>: на её месте может стоять что угодно (<span class="D">A</span> или <span class="R">a</span>), фенотип всё равно доминантный. По генотипу так не пишут. Так делал сам Мендель, и сейчас это часто используют в генетике и селекции.</p>
+<h3>Возвратное и анализирующее скрещивание</h3>
+<div class="def"><b class="term">Возвратное скрещивание</b> (<b class="term">бэккросс</b>, backcross, потомство обозначают F<sub>B</sub>) — скрещивание гибридов F<sub>1</sub> с одной из родительских форм. Точнее: скрещивание особей с генотипом гибрида F<sub>1</sub> с особями, имеющими генотип родительской формы.</div>
+<div class="cross">
+<span class="l">F<sub>B</sub></span>♀ <span class="D">A</span><span class="R">a</span> × ♂ <span class="D">AA</span> → <span class="D">AA</span>, <span class="D">A</span><span class="R">a</span> <span class="c">— по генотипу 1 : 1, по фенотипу расщепления нет</span><br>
+<span class="l">F<sub>B</sub></span>♀ <span class="D">A</span><span class="R">a</span> × ♂ <span class="R">aa</span> → <span class="D">A</span><span class="R">a</span>, <span class="R">aa</span> <span class="c">— это анализирующее скрещивание, 1 : 1 и по генотипу, и по фенотипу</span>
+</div>
+<div class="def"><b class="term">Анализирующее скрещивание</b> — скрещивание с рецессивной гомозиготой (<span class="R">aa</span>).</div>
+<div class="mem">При анализирующем скрещивании расщепление по генотипу и по фенотипу совпадает (в подавляющем большинстве случаев).</div>
+<p>Зачем нужно: в F<sub>2</sub> особи <span class="D">AA</span> и <span class="D">A</span><span class="R">a</span> по внешнему виду не отличить. Скрестив с <span class="R">aa</span>, видим: если в потомстве нет расщепления, особь была <span class="D">AA</span>; если 1 : 1, была <span class="D">A</span><span class="R">a</span>. Бэккросс — один из важнейших методов селекции растений.</p>
+</section>
+
+<!-- 5 -->
+<section id="s5"><h2><span class="n">5</span>Взаимодействие аллелей</h2>
+<p>Примерно через 35 лет после Менделя оказалось, что гетерозигота не всегда похожа на доминантную гомозиготу. Ввели понятие <b class="term">взаимодействие аллелей</b>.</p>
+<div class="lec">Аллель — это участок ДНК, никакого «взаимодействия» между участками ДНК нет. Это просто термин, которым назвали явления, которых Мендель не знал.</div>
+<div class="tw"><table>
+<tr><th>Тип</th><th>Фенотипы</th><th>Суть</th><th>F<sub>2</sub> по фенотипу</th></tr>
+<tr><td><b class="term">Полное доминирование</b></td><td>AA = Aa &gt; aa</td><td>гетерозигота по фенотипу такая же, как доминантная гомозигота</td><td>3 : 1</td></tr>
+<tr><td><b class="term">Неполное доминирование</b> ★</td><td>AA &gt; Aa &gt; aa</td><td>фенотип F<sub>1</sub> промежуточный между родителями</td><td>1 : 2 : 1</td></tr>
+<tr><td><b class="term">Сверхдоминирование</b> ★</td><td>AA &lt; Aa &gt; aa</td><td>гетерозигота превосходит обе гомозиготы (<b class="term">моногибридный гетерозис</b>)</td><td>1 : 2 : 1</td></tr>
+<tr><td><b class="term">Кодоминирование</b> ★</td><td>Aa = A + a</td><td>в F<sub>1</sub> проявляются признаки обоих родителей</td><td>1 : 2 : 1</td></tr>
+<tr><td><b class="term">Межаллельная комплементация</b></td><td>a₁a₂ = A</td><td>два разных рецессивных аллеля вместе дают доминантный фенотип</td><td>—</td></tr>
+</table></div>
+<div class="mem">★ При неполном доминировании, сверхдоминировании и кодоминировании расщепление в F<sub>2</sub> по фенотипу совпадает с расщеплением по генотипу (1 : 2 : 1, три фенотипа).</div>
+<h3>Сверхдоминирование: пример</h3>
+<p>Одно растение пшеницы высотой 70 см, другое 1 м, а гибрид от их скрещивания вырос двухметровым.</p>
+<h3>Кодоминирование: подробнее</h3>
+<p>В учебниках обычно приводят один пример: IV группа крови человека (I<sup>A</sup>I<sup>B</sup>). На самом деле так наследуются практически все <b>биохимические</b> признаки. На уровне морфологии (внешнего строения) кодоминирование невозможно.</p>
+<div class="fig"><svg viewBox="0 0 520 110" width="520">
+<text x="10" y="30">A → белок</text><rect x="100" y="16" width="34" height="20" rx="2" class="ln"/>
+<text x="10" y="70">a → белок</text><circle cx="117" cy="64" r="12" class="ln"/>
+<text x="200" y="50">♀ AA × ♂ aa</text>
+<path d="M300 46 h30" class="ln"/><path d="M326 41 l6 5 -6 5" class="ln"/>
+<text x="345" y="50">F₁ Aa →</text><rect x="408" y="36" width="34" height="20" rx="2" class="ln"/><circle cx="466" cy="46" r="12" class="ln"/>
+<text x="345" y="90" class="sm mut">у гетерозиготы есть оба белка</text>
+</svg><div class="cap">Кодоминирование: гетерозигота синтезирует и тот, и другой вариант белка</div></div>
+<h3>Межаллельная комплементация: пример с дрожжами</h3>
+<p>Открыта на дрожжах, потом оказалось, что это частое явление. Дрожжи бывают белые и красные: <span class="D">A</span> — белые, <span class="R">a</span> — красные. Аллель <span class="D">A</span> кодирует фермент, который разлагает красный пигмент, поэтому с ним дрожжи белые.</p>
+<p>У разных штаммов найдено много рецессивных аллелей: a₁, a₂, a₃… (это и есть <b class="term">множественный аллелизм</b>: у вида много аллелей одного гена).</p>
+<table><tr><th>Генотип</th><th>Цвет</th></tr>
+<tr><td>Aa</td><td>белые</td></tr><tr><td>a₁a₁</td><td>красные</td></tr><tr><td>a₂a₂</td><td>красные</td></tr><tr><td>a₁a₂</td><td><b>белые!</b></td></tr></table>
+<p><b>Почему так.</b> Фермент работает только в виде <b class="term">димера</b> (две одинаковые молекулы белка соединены вместе, это <b>четвертичная структура белка</b>). У a₁ мутантный белок одной формы, у a₂ другой: сами с собой они складываются «неправильно», фермент не работает. А белки a₁ и a₂ вместе складываются так, что получается похоже на нормальный фермент. Работает хуже, но перевести красное в белое сил хватает.</p>
+</section>
+
+<!-- 6 -->
+<section id="s6"><h2><span class="n">6</span>Метод хи-квадрат (χ²)</h2>
+<p>Расщепление 3 : 1 получается за счёт случайного сочетания гамет, то есть по теории вероятности. Если потомков очень много, результат близок к 3 : 1, если мало, возможны случайные отклонения.</p>
+<div class="lec">Пример: в ящике поровну красных и белых шаров. Вытащите по тысяче, получится близко к 999 и 1001. Вытащите 10, совсем не обязательно будет 5 и 5.</div>
+<div class="mem">Закон расщепления носит статистический (вероятностный) характер. Чем больше особей, тем ближе к теоретическому отношению.</div>
+<p><b class="term">Метод хи-квадрат</b> — статистический метод, который позволяет определить, соответствует ли реально полученное расщепление ожидаемому (например, 3 : 1) или противоречит ему. Придумал его статистик, а не биолог.</p>
+<h3>Пример: получили 250 жёлтых и 150 зелёных. Это 3 : 1?</h3>
+<div class="tw"><table>
+<tr><th>Фенотип</th><th>Жёлтые</th><th>Зелёные</th><th></th></tr>
+<tr><td>Фактические данные (Ф)</td><td>250</td><td>150</td><td>всего 400</td></tr>
+<tr><td>Теоретические (Т)</td><td>300</td><td>100</td><td>3 : 1 от 400</td></tr>
+<tr><td>Ф − Т</td><td>−50</td><td>50</td><td></td></tr>
+<tr><td>(Ф − Т)²</td><td>2500</td><td>2500</td><td></td></tr>
+<tr><td>(Ф − Т)² / Т</td><td>8,3</td><td>25</td><td>Σ = <b>33,3</b></td></tr>
+</table></div>
+<div class="mem">Теоретические числа — это не «как обычно бывает», а сколько было бы при идеальном выполнении проверяемого расщепления на том же общем числе особей. Здесь многие путаются.</div>
+<ol>
+<li>Сумма нижней строки — это <b class="term">χ² фактический</b>: χ²<sub>ф</sub> = 33,3.</li>
+<li><b class="term">Число степеней свободы</b> n = число классов − 1 = 2 − 1 = 1.</li>
+<li>По таблице χ² находим теоретическое (табличное) значение для n = 1 и <b class="term">уровня значимости</b> 0,05: χ²<sub>т</sub> = 3,84.</li>
+<li>Сравниваем: χ²<sub>ф</sub> = 33,3 &gt; χ²<sub>т</sub> = 3,84, значит <b>гипотеза 3 : 1 не верна</b>.</li>
+</ol>
+<div class="mem">Если χ²<sub>ф</sub> &lt; χ²<sub>т</sub>, гипотеза вероятно верна (отклонения случайны). Если χ²<sub>ф</sub> &gt; χ²<sub>т</sub>, гипотезу отвергаем.</div>
+</section>
+
+<!-- 7 -->
+<section id="s7"><h2><span class="n">7</span>Дигибридное скрещивание: III закон Менделя</h2>
+<div class="gap">В записи лекции здесь пропуск: этот раздел собран по рукописному конспекту.</div>
+<p><b class="term">Дигибридное скрещивание</b>: родители различаются по двум признакам. <span class="D">A</span> — жёлтые, <span class="R">a</span> — зелёные; <span class="D">B</span> — гладкие, <span class="R">b</span> — морщинистые.</p>
+<div class="cross">
+<span class="l">P</span>♀ <span class="D">AABB</span> × ♂ <span class="R">aabb</span><br>
+<span class="l">Г</span><span class="D">AB</span> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <span class="R">ab</span><br>
+<span class="l">F₁</span><span class="D">A</span><span class="R">a</span><span class="D">B</span><span class="R">b</span> <span class="c">— дигетерозигота</span><br>
+<span class="l">Г</span>AB, Ab, aB, ab <span class="c">— 4 типа гамет у каждого родителя</span>
+</div>
+<h3>Способ 1: решётка Пеннета</h3>
+<div class="tw"><table class="pun">
+<tr><th>♀ \ ♂</th><th>AB</th><th>Ab</th><th>aB</th><th>ab</th></tr>
+<tr><th>AB</th><td>AABB</td><td>AABb</td><td>AaBB</td><td>AaBb</td></tr>
+<tr><th>Ab</th><td>AABb</td><td>AAbb</td><td>AaBb</td><td>Aabb</td></tr>
+<tr><th>aB</th><td>AaBB</td><td>AaBb</td><td>aaBB</td><td>aaBb</td></tr>
+<tr><th>ab</th><td>AaBb</td><td>Aabb</td><td>aaBb</td><td>aabb</td></tr>
+</table></div>
+<p>16 клеток, <b>9 генотипов, 4 фенотипа</b>. Проверка: числа перед генотипами в сумме должны дать 16, иначе где-то ошибка.</p>
+<h3>Способ 2: группировка генотипов</h3>
+<table>
+<tr><th>Дигомозиготы (по 1)</th><th>Моногетерозиготы (по 2)</th><th>Дигетерозигота (4)</th></tr>
+<tr><td>AABB, AAbb, aaBB, aabb</td><td>AABb, AaBB, Aabb, aaBb</td><td>AaBb</td></tr>
+</table>
+<p>4·1 + 4·2 + 4 = 16.</p>
+<h3>Способ 3: перемножение расщеплений</h3>
+<p>По генотипу: (1 AA : 2 Aa : 1 aa) × (1 BB : 2 Bb : 1 bb), 3 × 3 = 9 генотипов.</p>
+<p>По фенотипу: (3 A– : 1 aa) × (3 B– : 1 bb) =</p>
+<p style="text-align:center"><span class="ratio">9 A–B– : 3 A–bb : 3 aaB– : 1 aabb</span></p>
+<div class="def"><b class="term">III закон Менделя</b> — <b>закон независимого расщепления признаков</b> (независимого наследования): каждая пара признаков расщепляется независимо от другой, расщепление по фенотипу 9 : 3 : 3 : 1.</div>
+</section>
+
+<!-- 8 -->
+<section id="s8"><h2><span class="n">8</span>Взаимодействие генов</h2>
+<div class="def"><b class="term">Взаимодействие генов</b> — явление, когда несколько разных генов определяют один и тот же признак.</div>
+<div class="lec">Как и с аллелями: никакого взаимодействия гены не ведут, «не подходят и не здороваются». Термин придуман, чтобы объяснить непонятные расщепления.</div>
+<p>Разберём три типа.</p>
+
+<h3>1. Комплементарность</h3>
+<div class="def"><b class="term">Комплементарность</b> — взаимодействие, при котором сочетание в генотипе доминантных аллелей двух разных генов даёт новый признак. (К комплиментам отношения не имеет.)</div>
+<p>Пример: окраска цветков мака. A, a, B, b по отдельности дают белую окраску, а A + B вместе — красную.</p>
+<div class="cross">
+<span class="l">P</span>♀ AAbb <span class="c">(бел.)</span> × ♂ aaBB <span class="c">(бел.)</span><br>
+<span class="l">Г</span>Ab &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; aB<br>
+<span class="l">F₁</span>AaBb <span class="c">— красные (новый признак)</span><br>
+<span class="l">Г</span>AB, Ab, aB, ab<br>
+<span class="l">F₂</span>9 генотипов; 9 A–B– красные : 7 белые
+</div>
+<p>Фенотипов два, <span class="ratio">9 : 7</span> (красные : белые). Белые: 3 A–bb + 3 aaB– + 1 aabb = 7.</p>
+
+<h3>2. Эпистаз</h3>
+<div class="def"><b class="term">Эпистаз</b> — взаимодействие, при котором один ген подавляет действие другого гена.</div>
+<p>Подавляющий ген называется <b class="term">ингибитор</b> или <b class="term">супрессор</b>. Если подавляет доминантный аллель, это <b class="term">доминантный эпистаз</b>, если рецессивный — <b class="term">рецессивный эпистаз</b>.</p>
+<p>Пример: A — красная окраска, a — белая; I — подавляет окраску, i — не подавляет. Ингибитор доминантный, значит эпистаз доминантный.</p>
+<div class="cross">
+<span class="l">P</span>♀ AAII <span class="c">(бел.)</span> × ♂ aaii <span class="c">(бел.)</span><br>
+<span class="l">Г</span>AI &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ai<br>
+<span class="l">F₁</span>AaIi <span class="c">— белые</span><br>
+<span class="l">Г</span>AI, Ai, aI, ai<br>
+<span class="l">F₂</span>красные только A–ii: 1 AAii + 2 Aaii = 3
+</div>
+<p>Доминантный эпистаз: красные : белые = <span class="ratio">3 : 13</span>.</p>
+<div class="lec">Белые скрестили с белыми и получили белых. Очень хочется сказать, что генотипы у них одинаковые, но так говорить нельзя.</div>
+<p>Если в том же примере подавляет <b>рецессивный</b> аллель (ii), красными будут только A–I–: <span class="ratio">9 : 7</span> (красные : белые).</p>
+<div class="mem">Комплементарность и рецессивный эпистаз дают одинаковое 9 : 7. Чисто генетическими методами их не отличить, нужны негенетические (биохимические) методы.</div>
+
+<h3>3. Полимерия</h3>
+<div class="def"><b class="term">Полимерия</b> — взаимодействие, при котором разные гены одинаково влияют на развитие одного признака. При полимерии разные гены обозначают <b>одной буквой с разными индексами</b>: A₁, A₂…</div>
+<ul>
+<li><b class="term">Некумулятивная полимерия</b>: достаточно хотя бы одного доминантного аллеля любого из генов, чтобы признак проявился.</li>
+<li><b class="term">Кумулятивная полимерия</b>: эффекты каждого доминантного аллеля складываются.</li>
+</ul>
+<h4>Некумулятивная: устойчивость пшеницы к болезни</h4>
+<p>A₁, A₂ — устойчивость, a₁, a₂ — восприимчивость.</p>
+<div class="cross">
+<span class="l">P</span>♀ A₁A₁a₂a₂ <span class="c">(уст.)</span> × ♂ a₁a₁A₂A₂ <span class="c">(уст.)</span><br>
+<span class="l">Г</span>A₁a₂ &nbsp;&nbsp;&nbsp;&nbsp; a₁A₂<br>
+<span class="l">F₁</span>A₁a₁A₂a₂ <span class="c">— устойчивые</span><br>
+<span class="l">F₂</span>неустойчивы только a₁a₁a₂a₂ (1 из 16)
+</div>
+<p>Расщепление по фенотипу <span class="ratio">15 : 1</span>.</p>
+<h4>Кумулятивная: длина хвоста у кроликов</h4>
+<p>Каждый доминантный аллель (A₁ или A₂) даёт 3 см хвоста, каждый рецессивный — 1 см.</p>
+<div class="cross">
+<span class="l">P</span>♀ a₁a₁a₂a₂ <span class="c">(4 см)</span> × ♂ A₁A₁A₂A₂ <span class="c">(12 см)</span><br>
+<span class="l">Г</span>a₁a₂ &nbsp;&nbsp;&nbsp;&nbsp; A₁A₂<br>
+<span class="l">F₁</span>A₁a₁A₂a₂ <span class="c">— 8 см</span><br>
+<span class="l">Г</span>A₁A₂ (6 см), A₁a₂ (4), a₁A₂ (4), a₁a₂ (2) <span class="c">— вклад гаметы</span>
+</div>
+<div class="tw"><table class="pun">
+<tr><th></th><th>A₁A₂</th><th>A₁a₂</th><th>a₁A₂</th><th>a₁a₂</th></tr>
+<tr><th>A₁A₂</th><td>12</td><td>10</td><td>10</td><td>8</td></tr>
+<tr><th>A₁a₂</th><td>10</td><td>8</td><td>8</td><td>6</td></tr>
+<tr><th>a₁A₂</th><td>10</td><td>8</td><td>8</td><td>6</td></tr>
+<tr><th>a₁a₂</th><td>8</td><td>6</td><td>6</td><td>4</td></tr>
+</table></div>
+<p>Длина хвоста в F<sub>2</sub>: 4 см : 6 см : 8 см : 10 см : 12 см = <span class="ratio">1 : 4 : 6 : 4 : 1</span>. Пять фенотипов: число доминантных аллелей в генотипе может быть 0, 1, 2, 3 или 4.</p>
+<div class="mem">Соотношение записывают по возрастанию длины (признака), а не по возрастанию количества.</div>
+</section>
+
+<!-- 9 -->
+<section id="s9"><h2><span class="n">9</span>Деление клеток: митоз</h2>
+<p>Законы Менделя переоткрыли в 1900 году <b>Корренс, Чермак и де Фриз</b>. Одна из причин, почему им сразу поверили: к этому времени уже было хорошо известно, как делятся клетки, а делятся они двумя способами: митозом и мейозом.</p>
+<div class="def"><b class="term">Митоз</b> — деление клетки, при котором в норме из одной клетки образуются две генетически идентичные.</div>
+<p><b class="term">Интерфаза</b> — период между появлением новой клетки и началом её деления. В интерфазе выделяют периоды G₁, S, G₂.</p>
+<h3>Фазы митоза</h3>
+<table>
+<tr><th>Фаза</th><th>Что происходит</th></tr>
+<tr><td><b class="term">Профаза</b></td><td>Становятся видны длинные тонкие нити — <b class="term">хромосомы</b>. Каждая состоит из двух плотно прилегающих нитей — <b class="term">хроматид</b>. Растворяется ядерная мембрана, исчезает ядрышко, хромосомы оказываются в цитоплазме (в центре клетки).</td></tr>
+<tr><td><b class="term">Метафаза</b></td><td>К хромосомам (из двух хроматид) прикрепляются <b class="term">нити веретена деления</b> с двух сторон, вторым концом нити крепятся к полюсам клетки. В конце метафазы две хроматиды отделяются друг от друга и становятся самостоятельными хромосомами.</td></tr>
+<tr><td><b class="term">Анафаза</b></td><td>Нити веретена деления сокращаются и растаскивают хромосомы к полюсам.</td></tr>
+<tr><td><b class="term">Телофаза</b></td><td>На каждом полюсе оказывается по набору хромосом, хромосомы истончаются, вокруг них образуется ядерная мембрана, образуются две новые клетки.</td></tr>
+</table>
+<div class="mem">Образуются ли митозом половые клетки? Смотря у кого: у растений спермии образуются митозом (см. <a href="#s11">раздел 11</a>).</div>
+</section>
+
+<!-- 10 -->
+<section id="s10"><h2><span class="n">10</span>Мейоз</h2>
+<div class="def"><b class="term">Мейоз</b> — два последовательных деления клетки, в результате которых из одной клетки образуются четыре, у каждой в 2 раза меньше хромосом, чем у исходной, и все четыре клетки генетически не идентичны.</div>
+<div class="mem">В результате мейоза иногда образуются половые клетки, а иногда нет (у растений образуются споры).</div>
+<p>Первое деление мейоза — <b class="term">редукционное деление</b>, второе — <b class="term">эквационное деление</b>. Фазы в каждом примерно те же, что в митозе, но очень сложно протекает профаза I.</p>
+<h3>Профаза I: пять стадий (Л-З-П-Д-Д)</h3>
+<table>
+<tr><th>Стадия</th><th>Что происходит</th></tr>
+<tr><td><b class="term">Лептотена</b></td><td>видны тонкие нити хромосом (каждая из двух хроматид)</td></tr>
+<tr><td><b class="term">Зиготена</b></td><td>каждая хромосома находит похожую на неё — <b class="term">гомологичную хромосому</b>, и они ложатся строго друг напротив друга, очень плотно (<b class="term">конъюгация</b>). Образуется <b class="term">бивалент</b>: 2 хромосомы, 4 хроматиды. В конце зиготены начинается кроссинговер.</td></tr>
+<tr><td><b class="term">Пахитена</b></td><td>идёт и заканчивается <b class="term">кроссинговер</b>; хромосомы в биваленте начинают чуть-чуть отталкиваться, видны места перекреста — <b class="term">хиазмы</b></td></tr>
+<tr><td><b class="term">Диплотена</b></td><td>хромосомы отталкиваются сильнее, хиазмы «сползают» к концам, их становится меньше</td></tr>
+<tr><td><b class="term">Диакинез</b></td><td>уходят все хиазмы, кроме концевых, которые ещё удерживают гомологичные хромосомы вместе</td></tr>
+</table>
+<div class="def"><b class="term">Кроссинговер</b> — процесс обмена участками между хроматидами гомологичных хромосом. Результат — <b class="term">комбинативная изменчивость</b>.</div>
+<div class="mem">Обмениваются все 4 хроматиды друг с другом, в том числе и сестринские хроматиды одной хромосомы (хотя от этого ничего не меняется, они одинаковые). Это мало кто понимает.</div>
+<h3>Остальные фазы</h3>
+<table>
+<tr><th>Фаза</th><th>Что происходит</th></tr>
+<tr><td>Метафаза I</td><td>по экватору клетки ложатся <b>биваленты</b>; нити веретена цепляются к каждой хромосоме только с одной стороны (в митозе с двух)</td></tr>
+<tr><td>Анафаза I</td><td>к полюсам расходятся <b>не хроматиды, а целые хромосомы</b> (каждая из двух хроматид)</td></tr>
+<tr><td>Телофаза I</td><td>вокруг наборов хромосом образуется мембрана. Хромосом стало в 2 раза меньше: уменьшение числа называется <b class="term">редукция</b></td></tr>
+<tr><td><b class="term">Интеркинез</b></td><td>промежуток между делениями. У некоторых организмов всё здесь останавливается (яйцеклетки млекопитающих ждут оплодотворения)</td></tr>
+<tr><td>Профаза II</td><td>ничего особенного не происходит</td></tr>
+<tr><td>Метафаза II</td><td>нити веретена с двух сторон цепляются к хромосомам (как в митозе)</td></tr>
+<tr><td>Анафаза II</td><td>каждая хроматида становится отдельной хромосомой и уходит к полюсу</td></tr>
+<tr><td>Телофаза II</td><td>новые клетки вокруг хроматид. Итог: 4 клетки с разным сочетанием генов</td></tr>
+</table>
+</section>
+
+<!-- 11 -->
+<section id="s11"><h2><span class="n">11</span>Образование спор и гамет у цветковых растений</h2>
+<h3>В пыльниках: микроспорогенез и образование пыльцы</h3>
+<ol>
+<li>Материнская клетка пыльцы (2n) делится <b>мейозом</b> → 4 гаплоидные клетки (n), генетически разные. Это <b>не половые клетки</b>, а <b class="term">микроспоры</b>. На этом заканчивается <b class="term">микроспорогенез</b>.</li>
+<li>Микроспора делится <b>митозом</b> → <b class="term">вегетативная клетка</b> и <b class="term">генеративная клетка</b>.</li>
+<li>Генеративная клетка делится ещё раз <b>митозом</b> → 2 <b class="term">спермия</b>.</li>
+</ol>
+<div class="mem">Пыльцевое зерно состоит из 3 клеток: вегетативной и двух спермиев. Спермии — половые клетки, но образовались митозом.</div>
+<h3>В завязи: мегаспорогенез и мегагаметогенез</h3>
+<ol>
+<li>Материнская клетка мегаспоры (2n) в завязи пестика делится <b>мейозом</b> → 4 гаплоидные клетки. Три из них погибают, остаётся одна — <b class="term">мегаспора</b> (n). Это не половая клетка. Этап называется <b class="term">мегаспорогенез</b>.</li>
+<li>Мегаспора делится <b>митозом</b> три раза: 1 → 2 → 4 → 8 (<b class="term">мегагаметогенез</b>). Получается <b class="term">зародышевый мешок</b>.</li>
+<li>Из 8 ядер: 3 уходят к одному полюсу — <b class="term">яйцеклетка</b> и две <b class="term">синергиды</b>; 3 к другому — <b class="term">антиподы</b>; 2 остаются в центре и сливаются → <b class="term">центральная клетка</b> (2n).</li>
+</ol>
+<p style="font-size:14px;color:var(--muted)">В рукописном конспекте на этом месте обведено «микроспора», а должно быть «мегаспора» (макроспора).</p>
+<h3>Двойное оплодотворение</h3>
+<div class="fig"><svg viewBox="0 0 520 250" width="520">
+<ellipse cx="130" cy="135" rx="70" ry="105" class="ln"/>
+<text x="130" y="22" text-anchor="middle" class="sm mut">пыльцевая трубка</text>
+<path d="M130 26 v18" class="ln"/>
+<circle cx="112" cy="62" r="9" class="ln"/><circle cx="148" cy="62" r="9" class="ln"/><text x="80" y="58" class="sm">синергиды</text>
+<circle cx="130" cy="84" r="13" class="ln"/><text x="130" y="88" text-anchor="middle" class="sm">я</text>
+<circle cx="130" cy="140" r="17" class="ln"/><text x="130" y="144" text-anchor="middle" class="sm">2n</text>
+<circle cx="110" cy="205" r="9" class="ln"/><circle cx="130" cy="212" r="9" class="ln"/><circle cx="150" cy="205" r="9" class="ln"/>
+<text x="130" y="236" text-anchor="middle" class="sm mut">антиподы</text>
+<path d="M145 84 H250" class="ln"/><text x="258" y="80">спермий + яйцеклетка = зигота (2n)</text><text x="258" y="98" class="sm mut">→ зародыш</text>
+<path d="M149 140 H250" class="ln"/><text x="258" y="136">спермий + центральная клетка (2n)</text><text x="258" y="154" class="sm mut">= триплоидный эндосперм (3n) → питание зародыша</text>
+</svg><div class="cap">Зародышевый мешок и двойное оплодотворение</div></div>
+<p>Пыльцевое зерно попадает на рыльце. Вегетативная клетка нужна, чтобы выросла <b class="term">пыльцевая трубка</b> и проникла в зародышевый мешок, потом она погибает. Синергиды и антиподы тоже погибают. Два спермия сливаются:</p>
+<ul>
+<li>один с яйцеклеткой → <b class="term">зигота</b> (2n) → <b>зародыш</b>;</li>
+<li>второй с центральной клеткой → триплоидный <b class="term">эндосперм</b> (3n), которым питается зародыш, пока корешок не доберётся до почвы.</li>
+</ul>
+<p>Это называется <b class="term">двойное оплодотворение</b>.</p>
+</section>
+
+<!-- 12 -->
+<section id="s12"><h2><span class="n">12</span>Хромосомная теория наследственности</h2>
+<p><b>Сеттон и Бовери (1902-1903)</b> обратили внимание: хромосомы при мейозе и оплодотворении ведут себя точно так же, как «буковки» в схемах скрещивания. Отсюда вывод: гены находятся в хромосомах. Так была выдвинута <b class="term">хромосомная теория наследственности</b>.</p>
+<div class="fig"><svg viewBox="0 0 520 130" width="520">
+<path d="M30 25 q8 40 0 80" class="ln"/><path d="M60 25 q8 40 0 80" class="ln"/><text x="18" y="45">A</text><text x="66" y="45">a</text>
+<text x="20" y="125" class="sm mut">гомологичные хромосомы</text>
+<path d="M140 25 q6 40 0 80" class="ln"/><path d="M152 25 q6 40 0 80" class="ln"/><path d="M178 25 q6 40 0 80" class="ln"/><path d="M190 25 q6 40 0 80" class="ln"/>
+<text x="130" y="45" class="sm">A</text><text x="155" y="45" class="sm">A</text><text x="170" y="45" class="sm">a</text><text x="196" y="45" class="sm">a</text>
+<text x="128" y="125" class="sm mut">по 2 хроматиды</text>
+<path d="M225 65 h50" class="ln"/><path d="M270 60 l6 5 -6 5" class="ln"/><text x="232" y="56" class="sm">мейоз</text>
+<circle cx="310" cy="65" r="22" class="ln"/><text x="310" y="70" text-anchor="middle">A</text>
+<circle cx="365" cy="65" r="22" class="ln"/><text x="365" y="70" text-anchor="middle">A</text>
+<circle cx="420" cy="65" r="22" class="ln"/><text x="420" y="70" text-anchor="middle">a</text>
+<circle cx="475" cy="65" r="22" class="ln"/><text x="475" y="70" text-anchor="middle">a</text>
+<text x="392" y="115" text-anchor="middle" class="sm mut">4 клетки: по одному аллелю в каждой, как гаметы у Менделя</text>
+</svg></div>
+<p>Что эти «буковки» — участки ДНК, узнали только примерно через 50 лет.</p>
+<h3>Томас Морган</h3>
+<p>Эмбриолог Томас Морган с учениками-студентами (Стёртевант, Бриджес, Мёллер) взялся за генетику на мушке-дрозофиле (<i>Drosophila melanogaster</i>: та самая, что летит на гнилые бананы, с красными глазами). Сначала он хотел опровергнуть связь генов с хромосомами, а в итоге доказал её и получил за хромосомную теорию Нобелевскую премию (1933).</p>
+</section>
+
+<!-- 13 -->
+<section id="s13"><h2><span class="n">13</span>Хромосомное определение пола</h2>
+<p>Ещё Мендель заметил: расщепление по полу (обычно 1 : 1, мальчиков и девочек рождается примерно поровну) похоже на расщепление при анализирующем скрещивании.</p>
+<h3>Тип Protenor</h3>
+<p>У клопа <i>Protenor</i> у самки 14 хромосом, у самца 13. Одна хромосома у самки в двух экземплярах, у самца в одном. Её назвали <b class="term">половой хромосомой</b>, остальные — <b class="term">аутосомами</b> (неполовыми).</p>
+<div class="cross">♀ 14: AA XX &nbsp;&nbsp;&nbsp;&nbsp; ♂ 13: AA X0 <span class="c">(A — набор аутосом)</span></div>
+<h3>Тип Lygaeus (тип человека)</h3>
+<p>У другого клопа и у самки, и у самца по 14 хромосом, но у самца одна хромосома резко отличается по виду: ♀ AAXX, ♂ AAXY.</p>
+<div class="def"><b class="term">Гомогаметный пол</b> — даёт один тип гамет по половым хромосомам (XX). <b class="term">Гетерогаметный пол</b> — даёт два типа гамет (XY или X0).</div>
+<table>
+<tr><th>Кто</th><th>Гетерогаметный пол</th></tr>
+<tr><td>Человек, млекопитающие, мухи-дрозофилы</td><td>самцы (XY)</td></tr>
+<tr><td>Клопы <i>Protenor</i>, кузнечики</td><td>самцы (X0)</td></tr>
+<tr><td>Птицы, бабочки (моль)</td><td><b>самки</b>; гомогаметный пол — самцы</td></tr>
+</table>
+<div class="mem">Гомогаметный пол не обязательно женский: у всех птиц гомогаметны самцы.</div>
+</section>
+
+<!-- 14 -->
+<section id="s14"><h2><span class="n">14</span>Наследование, сцепленное с полом</h2>
+<div class="def"><b class="term">Наследование, сцепленное с полом</b> — наследование признаков, гены которых находятся в половых хромосомах.</div>
+<p>Открыто в лаборатории Моргана (Морган, Стёртевант, Бриджес, Мёллер) на дрозофиле. Аллель пишут индексом над X: X<sup>A</sup>, X<sup>a</sup>. В Y-хромосоме этого гена нет.</p>
+<div class="def"><b class="term">Гемизигота</b> — состояние, когда у диплоидного организма ген представлен только одним аллелем (самец X<sup>a</sup>Y). «Геми» значит половина.</div>
+<h3>Прямое скрещивание: цвет глаз дрозофилы</h3>
+<p>A — красные глаза, a — белые.</p>
+<div class="cross">
+<span class="l">P</span>♀ X<sup>A</sup>X<sup>A</sup> <span class="c">(кр.)</span> × ♂ X<sup>a</sup>Y <span class="c">(бел.)</span><br>
+<span class="l">Г</span>X<sup>A</sup> <span class="c">(гомогаметный)</span> &nbsp;&nbsp; X<sup>a</sup>, Y <span class="c">(гетерогаметный)</span><br>
+<span class="l">F₁</span>♀ X<sup>A</sup>X<sup>a</sup> <span class="c">(кр.)</span> &nbsp; ♂ X<sup>A</sup>Y <span class="c">(кр.)</span><br>
+<span class="l">Г</span>X<sup>A</sup>, X<sup>a</sup> &nbsp;&nbsp;&nbsp; X<sup>A</sup>, Y<br>
+<span class="l">F₂</span>♀ X<sup>A</sup>X<sup>A</sup> кр. &nbsp; ♀ X<sup>A</sup>X<sup>a</sup> кр. &nbsp; ♂ X<sup>A</sup>Y кр. &nbsp; ♂ X<sup>a</sup>Y бел.
+</div>
+<p>По цвету глаз 3 : 1 (как II закон), но с учётом пола: все самки красноглазые, а у самцов 1 : 1.</p>
+<div class="lec">Если смотреть только на цвет глаз, всё по Менделю: в F<sub>1</sub> единообразие, в F<sub>2</sub> 3 : 1. Как только смотрим ещё и на пол, законы «поплыли»: в F<sub>1</sub> расщепление по полу, а в F<sub>2</sub> нарушается III закон (независимое расщепление).</div>
+<h3>Реципрокное скрещивание</h3>
+<div class="def"><b class="term">Реципрокное скрещивание</b> — скрещивание, в котором родители «поменялись признаками» (теперь белоглазая самка и красноглазый самец).</div>
+<div class="cross">
+<span class="l">P</span>♀ X<sup>a</sup>X<sup>a</sup> <span class="c">(бел.)</span> × ♂ X<sup>A</sup>Y <span class="c">(кр.)</span><br>
+<span class="l">Г</span>X<sup>a</sup> &nbsp;&nbsp;&nbsp;&nbsp; X<sup>A</sup>, Y<br>
+<span class="l">F₁</span>♀ X<sup>A</sup>X<sup>a</sup> <span class="c">(кр.)</span> &nbsp; ♂ X<sup>a</sup>Y <span class="c">(бел.)</span> <span class="c">— крисс-кросс</span><br>
+<span class="l">Г</span>X<sup>A</sup>, X<sup>a</sup> &nbsp;&nbsp;&nbsp; X<sup>a</sup>, Y<br>
+<span class="l">F₂</span>♀ X<sup>A</sup>X<sup>a</sup> кр. &nbsp; ♀ X<sup>a</sup>X<sup>a</sup> бел. &nbsp; ♂ X<sup>A</sup>Y кр. &nbsp; ♂ X<sup>a</sup>Y бел.
+</div>
+<p>В F<sub>1</sub> расщепление уже не только по полу, но и по цвету глаз (I закон нарушен). Мать отдаёт свой признак всем сыновьям и только сыновьям, отец — всем дочерям и только дочерям: <b class="term">крисс-кросс наследование</b> (criss-cross, «крест-накрест») и по полу, и по цвету глаз. В F<sub>2</sub> красные : белые = 1 : 1 (а не 3 : 1), по цвету глаз и полу <span class="ratio">1 : 1 : 1 : 1</span>.</p>
+<div class="mem">Признак наследуется сцепленно с полом, если результаты реципрокных скрещиваний различаются.</div>
+<h3>Исключения: нерасхождение хромосом</h3>
+<p>В реципрокном скрещивании должны получаться только красноглазые самки и белоглазые самцы, но примерно в одном случае из двух тысяч появлялись белоглазые самки и красноглазые самцы. Объяснение (Бриджес; на лекции прозвучала фамилия Стёртевант): у самки X<sup>a</sup>X<sup>a</sup> неправильно идёт мейоз, обе X-хромосомы уходят в одну клетку (<b class="term">нерасхождение хромосом</b>). Получаются яйцеклетки X<sup>a</sup>X<sup>a</sup> (с двумя X) и 0 (без X).</p>
+<div class="cross">
+яйцеклетки X<sup>a</sup>X<sup>a</sup> и 0 &nbsp;×&nbsp; спермии X<sup>A</sup> и Y<br>
+X<sup>a</sup>X<sup>a</sup>Y <span class="c">— белоглазая самка</span><br>
+X<sup>A</sup>0 <span class="c">— красноглазый самец</span><br>
+X<sup>A</sup>X<sup>a</sup>X<sup>a</sup>, Y0 <span class="c">— почти не встречаются / не найдены (нежизнеспособны: в Y0 нет ни одной X)</span>
+</div>
+<p>Исключительных мух рассмотрели под микроскопом (в метафазе митоза хромосомы хорошо видны): все красноглазые самцы оказались без Y-хромосомы (X0), а все белоглазые самки имели XXY.</p>
+<div class="mem">Это первое прямое доказательство, что гены действительно находятся в хромосомах: поведение генов полностью совпало с поведением хромосом. То, что Сеттон и Бовери сказали как «наверное», здесь доказали.</div>
+<h3>Другие типы наследования, связанные с полом</h3>
+<table>
+<tr><th>Тип</th><th>Суть</th><th>Примеры</th></tr>
+<tr><td><b class="term">Признаки, ограниченные полом</b></td><td>гены есть и у самок, и у самцов, но проявляются только у одного пола</td><td>удойность коров (ген есть и у быков, но молока они не дают); яйценоскость кур (при отборе проверяют и петухов, у них тоже есть этот ген)</td></tr>
+<tr><td><b class="term">Частично сцепленные с полом</b></td><td>ген есть и в X, и в Y</td><td></td></tr>
+<tr><td><b class="term">Признаки, зависимые от пола</b></td><td>есть у обоих полов, но у одного пола аллель доминантный, у другого рецессивный</td><td>рогатость / комолость у коров, баранов, коз</td></tr>
+<tr><td><b class="term">Голандрические признаки</b></td><td>ген есть только в Y, а в X нет; признак бывает только у мужчин и передаётся всем сыновьям</td><td>перепонки между пальцами, волосы на ушах</td></tr>
+</table>
+<h4>Пример признака, зависимого от пола: рогатость</h4>
+<p>H — рогатость, h — <b class="term">комолость</b> (отсутствие рогов). У самцов H доминантный, у самок рецессивный.</p>
+<div class="lec">Ответ «F<sub>1</sub> рогатые» или «безрогие» неправильный: правильно «зависит от пола», и в схеме нужно подписывать пол у каждого генотипа.</div>
+<div class="cross">
+<span class="l">P</span>♀ hh <span class="c">(безрог.)</span> × ♂ HH <span class="c">(рог.)</span><br>
+<span class="l">F₁</span>♀ Hh <span class="c">(безрогие)</span> &nbsp;&nbsp; ♂ Hh <span class="c">(рогатые)</span><br>
+<span class="l">F₂</span>♀: HH рог. : 2 Hh безрог. : hh безрог. <span class="c">→ рогатые : безрогие = 1 : 3</span><br>
+<span class="l"></span>♂: HH рог. : 2 Hh рог. : hh безрог. <span class="c">→ 3 : 1</span>
+</div>
+</section>
+
+<!-- glossary -->
+<section id="glossary"><h2>Словарь терминов</h2>
+<input id="gq" type="search" placeholder="Найти термин…" autocomplete="off">
+<dl class="gl" id="gl"></dl>
+</section>
+
+</div>
+<script>
+const G=[
+["Генетика","наука о наследственности и изменчивости","s1"],
+["Наследственность","свойство живых организмов сохранять и передавать потомству свои признаки и свойства","s1"],
+["Изменчивость","свойство живых организмов изменяться в течение жизни и часть изменений передавать потомству","s1"],
+["Чистая линия","организмы, которые при скрещивании с организмами с такими же свойствами не дают расщепления","s2"],
+["Кастрация","удаление тычинок (пыльцы) у цветка перед искусственным скрещиванием","s2"],
+["Материнское растение","то, у которого удалили тычинки и на которого нанесли пыльцу; обозначается ♀","s2"],
+["Ген","внутренний фактор, определяющий развитие внешнего признака","s3"],
+["Аллели","разные альтернативные состояния одного гена","s3"],
+["Фенотип","внешнее проявление генов (совокупность признаков)","s3"],
+["Генотип","совокупность аллелей, определяющих признак(и)","s3"],
+["Соматические клетки","неполовые клетки; содержат по 2 аллеля каждого гена","s3"],
+["Гаметы","половые клетки; содержат по 1 аллелю каждого гена","s3"],
+["Доминантный признак","признак (аллель), проявившийся у гибридов F₁; пишется большой буквой","s3"],
+["Рецессивный признак","признак (аллель), не проявившийся у гибридов F₁; пишется маленькой буквой","s3"],
+["Гомозигота","организм с двумя одинаковыми аллелями одного гена (AA, aa)","s3"],
+["Гетерозигота","организм с двумя разными аллелями одного гена (Aa)","s3"],
+["Диплоидный","организм (клетка) с двойным набором хромосом (2n)","s3"],
+["Гемизигота","диплоидный организм, у которого ген представлен только одним аллелем (самец XᵃY)","s14"],
+["Моногибридное скрещивание","скрещивание родителей, различающихся по одному признаку","s4"],
+["I закон Менделя","закон единообразия гибридов первого поколения","s4"],
+["II закон Менделя","закон расщепления гибридов второго поколения: 1:2:1 по генотипу, 3:1 по фенотипу","s4"],
+["Радикал","чёрточка в записи A–: на её месте может стоять любой аллель","s4"],
+["Возвратное скрещивание","скрещивание гибридов F₁ с одной из родительских форм","s4"],
+["Бэккросс","то же, что возвратное скрещивание (backcross), потомство F_B","s4"],
+["Анализирующее скрещивание","скрещивание с рецессивной гомозиготой; расщепление по генотипу и фенотипу совпадает","s4"],
+["Взаимодействие аллелей","условное название отклонений от полного доминирования","s5"],
+["Полное доминирование","AA = Aa > aa; гетерозигота как доминантная гомозигота","s5"],
+["Неполное доминирование","AA > Aa > aa; фенотип F₁ промежуточный","s5"],
+["Сверхдоминирование","AA < Aa > aa; гетерозигота превосходит обе гомозиготы","s5"],
+["Моногибридный гетерозис","то же, что сверхдоминирование","s5"],
+["Кодоминирование","Aa = A + a; у гибрида проявляются признаки обоих родителей (группы крови, биохимические признаки)","s5"],
+["Межаллельная комплементация","два разных рецессивных аллеля вместе дают доминантный фенотип","s5"],
+["Множественный аллелизм","существование у вида многих аллелей одного гена (a₁, a₂, a₃…)","s5"],
+["Димер","белок из двух соединённых молекул (четвертичная структура)","s5"],
+["Метод хи-квадрат","статистический метод проверки, соответствует ли полученное расщепление ожидаемому","s6"],
+["χ² фактический","сумма (Ф−Т)²/Т по всем классам","s6"],
+["Число степеней свободы","число классов минус 1","s6"],
+["Уровень значимости","вероятность ошибки, при которой берут табличное χ² (обычно 0,05)","s6"],
+["Дигибридное скрещивание","скрещивание родителей, различающихся по двум признакам","s7"],
+["III закон Менделя","закон независимого расщепления признаков: 9:3:3:1","s7"],
+["Взаимодействие генов","явление, когда несколько разных генов определяют один признак","s8"],
+["Комплементарность","сочетание доминантных аллелей двух разных генов даёт новый признак; 9:7","s8"],
+["Эпистаз","один ген подавляет действие другого","s8"],
+["Ингибитор","ген, подавляющий действие другого гена при эпистазе","s8"],
+["Супрессор","то же, что ингибитор","s8"],
+["Доминантный эпистаз","подавляет доминантный аллель гена-ингибитора; 13:3","s8"],
+["Рецессивный эпистаз","подавляет рецессивный аллель гена-ингибитора","s8"],
+["Полимерия","разные гены одинаково влияют на один признак; A₁, A₂…","s8"],
+["Некумулятивная полимерия","достаточно одного доминантного аллеля любого гена; 15:1","s8"],
+["Кумулятивная полимерия","эффекты доминантных аллелей складываются; 1:4:6:4:1","s8"],
+["Митоз","деление, при котором из одной клетки образуются две генетически идентичные","s9"],
+["Интерфаза","период между появлением клетки и началом её деления (G₁, S, G₂)","s9"],
+["Профаза","видны хромосомы из двух хроматид, растворяется ядерная мембрана, исчезает ядрышко","s9"],
+["Метафаза","нити веретена деления прикрепляются к хромосомам","s9"],
+["Анафаза","нити веретена сокращаются, хромосомы расходятся к полюсам","s9"],
+["Телофаза","на полюсах наборы хромосом, образуются ядерные мембраны и новые клетки","s9"],
+["Хромосомы","нити в ядре, видимые при делении; несут гены","s9"],
+["Хроматиды","две нити, из которых состоит хромосома перед делением","s9"],
+["Нити веретена деления","нити, которые прикрепляются к хромосомам и тянут их к полюсам","s9"],
+["Мейоз","два деления: из 1 клетки 4 с вдвое меньшим числом хромосом, генетически разные","s10"],
+["Редукционное деление","первое деление мейоза, число хромосом уменьшается вдвое","s10"],
+["Эквационное деление","второе деление мейоза, расходятся хроматиды","s10"],
+["Редукция","уменьшение числа хромосом вдвое","s10"],
+["Лептотена","1-я стадия профазы I: видны тонкие нити хромосом","s10"],
+["Зиготена","2-я стадия профазы I: конъюгация гомологичных хромосом, образуется бивалент","s10"],
+["Пахитена","3-я стадия профазы I: кроссинговер","s10"],
+["Диплотена","4-я стадия профазы I: хромосомы отталкиваются, видны хиазмы","s10"],
+["Диакинез","5-я стадия профазы I: остаются только концевые хиазмы","s10"],
+["Гомологичные хромосомы","парные, похожие друг на друга хромосомы (одна от матери, другая от отца)","s10"],
+["Конъюгация","плотное сближение гомологичных хромосом в зиготене","s10"],
+["Бивалент","пара конъюгировавших гомологичных хромосом: 2 хромосомы, 4 хроматиды","s10"],
+["Кроссинговер","обмен участками между хроматидами гомологичных хромосом","s10"],
+["Хиазма","место перекреста хромосом после кроссинговера","s10"],
+["Комбинативная изменчивость","изменчивость за счёт новых сочетаний генов (кроссинговер, мейоз)","s10"],
+["Интеркинез","промежуток между первым и вторым делением мейоза","s10"],
+["Микроспора","гаплоидная клетка из мейоза в пыльнике; не половая клетка","s11"],
+["Микроспорогенез","образование микроспор мейозом в пыльниках","s11"],
+["Вегетативная клетка","клетка пыльцевого зерна, образующая пыльцевую трубку","s11"],
+["Генеративная клетка","клетка пыльцевого зерна, которая делится митозом на 2 спермия","s11"],
+["Спермии","мужские половые клетки растений; образуются митозом","s11"],
+["Мегаспора","единственная выжившая из 4 клеток мейоза в завязи; не половая клетка","s11"],
+["Мегаспорогенез","образование мегаспоры мейозом в завязи","s11"],
+["Мегагаметогенез","три митоза мегаспоры: образование зародышевого мешка","s11"],
+["Зародышевый мешок","8-ядерная структура: яйцеклетка, 2 синергиды, 3 антипода, центральная клетка","s11"],
+["Яйцеклетка","женская половая клетка","s11"],
+["Синергиды","две клетки рядом с яйцеклеткой, погибают","s11"],
+["Антиподы","три клетки на противоположном полюсе зародышевого мешка, погибают","s11"],
+["Центральная клетка","диплоидная клетка из слияния двух ядер в центре зародышевого мешка","s11"],
+["Пыльцевая трубка","вырастает из вегетативной клетки, доставляет спермии","s11"],
+["Зигота","оплодотворённая яйцеклетка (2n), из неё развивается зародыш","s11"],
+["Эндосперм","триплоидная (3n) ткань для питания зародыша","s11"],
+["Двойное оплодотворение","один спермий + яйцеклетка, второй + центральная клетка","s11"],
+["Хромосомная теория наследственности","гены находятся в хромосомах (Сеттон и Бовери, Морган)","s12"],
+["Половые хромосомы","хромосомы, по которым различаются полы (X, Y)","s13"],
+["Аутосомы","все неполовые хромосомы","s13"],
+["Гомогаметный пол","даёт один тип гамет по половым хромосомам (XX)","s13"],
+["Гетерогаметный пол","даёт два типа гамет (XY, X0)","s13"],
+["Наследование, сцепленное с полом","наследование генов, находящихся в половых хромосомах","s14"],
+["Реципрокное скрещивание","скрещивание, в котором родители поменялись признаками","s14"],
+["Крисс-кросс наследование","сыновья похожи на мать, дочери на отца","s14"],
+["Нерасхождение хромосом","обе половые хромосомы при мейозе уходят в одну клетку","s14"],
+["Признаки, ограниченные полом","гены у обоих полов, проявляются у одного (удойность, яйценоскость)","s14"],
+["Частично сцепленные с полом","ген есть и в X, и в Y","s14"],
+["Признаки, зависимые от пола","у одного пола аллель доминантный, у другого рецессивный (рогатость)","s14"],
+["Комолость","отсутствие рогов у коров, баранов, коз","s14"],
+["Голандрические признаки","ген только в Y-хромосоме, передаётся от отца к сыну","s14"]
+];
+G.sort((a,b)=>a[0].localeCompare(b[0],'ru'));
+const norm=s=>s.toLowerCase().replace(/ё/g,'е').replace(/[^a-zа-я0-9²χ ]/g,'').trim();
+const gl=document.getElementById('gl');
+gl.innerHTML=G.map((g,i)=>`<div id="g${i}" data-k="${norm(g[0])}"><dt>${g[0]}</dt><dd>${g[1]}</dd><a class="go" href="#${g[2]}">в тексте ↑</a></div>`).join('');
+// link terms in text to glossary
+const keys=G.map((g,i)=>[norm(g[0]),i]);
+function find(t){
+  t=norm(t);
+  let best=null;
+  for(const [k,i] of keys){
+    if(k===t) return i;
+    const stem=w=>w.slice(0,Math.max(4,w.length-2));
+    const kw=k.split(' '), tw=t.split(' ');
+    if(kw.length===tw.length && kw.every((w,j)=>Math.abs(w.length-tw[j].length)<=4&&(tw[j].startsWith(stem(w))||w.startsWith(stem(tw[j]))))) best=best??i;
+  }
+  return best;
+}
+document.querySelectorAll('section:not(#glossary) .term').forEach(el=>{
+  const i=find(el.textContent);
+  if(i==null) return;
+  el.title=G[i][1];
+  el.addEventListener('click',()=>{
+    const d=document.getElementById('g'+i);
+    d.scrollIntoView({behavior:'smooth',block:'center'});
+    d.classList.add('hl'); setTimeout(()=>d.classList.remove('hl'),1800);
+  });
+});
+document.getElementById('gq').addEventListener('input',e=>{
+  const q=norm(e.target.value);
+  gl.querySelectorAll('div').forEach(d=>{d.style.display=!q||d.dataset.k.includes(q)||norm(d.textContent).includes(q)?'':'none'});
+});
+</script>
+</body></html>
